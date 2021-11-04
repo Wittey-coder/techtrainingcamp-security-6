@@ -18,5 +18,8 @@ func main() {
 	}
 
 	app := router.SetRoute()
-	app.Run(cfg.AppHost + ":" + cfg.AppPort)
+	err = app.Run(cfg.AppHost + ":" + cfg.AppPort)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }
