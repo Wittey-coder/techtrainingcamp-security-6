@@ -1,9 +1,8 @@
 package main
 
 import (
-	"awesomeProject/controller"
+	"awesomeProject/router"
 	"awesomeProject/tool"
-	"github.com/gin-gonic/gin"
 	"log"
 )
 
@@ -18,11 +17,6 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	app := gin.Default()
-	registerRouter(app)
-	app.Run(cfg.AppHost+":"+cfg.AppPort)
-}
-
-func registerRouter(router *gin.Engine)  {
-	new(controller.RegisterController).Router(router)
+	app := router.SetRoute()
+	app.Run(cfg.AppHost + ":" + cfg.AppPort)
 }

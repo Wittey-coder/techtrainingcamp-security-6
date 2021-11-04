@@ -8,23 +8,18 @@ import (
 )
 
 type RegisterController struct {
-	
 }
 
-func (mc *RegisterController) Router(engine *gin.Engine)  {
-	engine.POST("/api/apply_code", mc.sendCode)
-}
-
-func (mc RegisterController) sendCode(context *gin.Context)  {
+func SendCode(context *gin.Context) {
 	var applyCode = tool.ApplyCodeRequest{}
 	err := context.ShouldBindJSON(&applyCode)
 	if err != nil {
 		context.JSON(http.StatusOK, tool.ApplyCodeResponse{
 			Code:    1,
 			Message: "信息错误！",
-			Data:    tool.Data{
-				VerifyCode: "",
-				ExpireTime: 0,
+			Data: tool.Data{
+				VerifyCode:   "",
+				ExpireTime:   0,
 				DecisionType: 0,
 			},
 		})
@@ -37,9 +32,9 @@ func (mc RegisterController) sendCode(context *gin.Context)  {
 		context.JSON(http.StatusOK, tool.ApplyCodeResponse{
 			Code:    0,
 			Message: "请求成功",
-			Data:    tool.Data{
-				VerifyCode: s,
-				ExpireTime: 1000,
+			Data: tool.Data{
+				VerifyCode:   s,
+				ExpireTime:   1000,
 				DecisionType: 0,
 			},
 		})
@@ -48,9 +43,9 @@ func (mc RegisterController) sendCode(context *gin.Context)  {
 	context.JSON(http.StatusOK, tool.ApplyCodeResponse{
 		Code:    1,
 		Message: "生成验证码失败！",
-		Data:    tool.Data{
-			VerifyCode: "",
-			ExpireTime: 0,
+		Data: tool.Data{
+			VerifyCode:   "",
+			ExpireTime:   0,
 			DecisionType: 0,
 		},
 	})
