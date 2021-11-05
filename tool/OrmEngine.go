@@ -5,12 +5,15 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
 )
+
 var DbEngine *Orm
+
 type Orm struct {
 	*xorm.Engine
 }
 
-func OrmEngine(cfg *Config) (*Orm, error){
+// OrmEngine 根据配置信息生成ORM对象
+func OrmEngine(cfg *Config) (*Orm, error) {
 	database := cfg.Database
 	conn := database.User + ":" + database.Password + "@tcp(" + database.Host + ":" + database.Port + ")/" + database.DbName + "?charset=" + database.Charset
 	engine, err := xorm.NewEngine(database.Driver, conn)
@@ -18,7 +21,8 @@ func OrmEngine(cfg *Config) (*Orm, error){
 		return nil, err
 	}
 	engine.ShowSQL(database.ShowSql)
-	err = engine.Sync2(new(model.SmsCode))
+	//两张表，验证码和用户
+	err = engine.Sync2(new(model.SmsCode), new(model.User))
 	if err != nil {
 		return nil, err
 	}
