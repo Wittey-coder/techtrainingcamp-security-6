@@ -23,7 +23,7 @@ func (s *UserService) SendCode(phone string) (bool, string) {
 	userDao := dao.UserDao{Orm: tool.DbEngine}
 	result := userDao.InsertCode(smsCode)
 
-	return result > 0, phone
+	return result > 0, code
 }
 
 // LoginByPhone 手机登录
@@ -40,9 +40,10 @@ func (s *UserService) LoginByPhone(loginParam parameter.LoginByPhoneRequest) *mo
 }
 
 // LoginByPassword 密码登录
-func (s *UserService) LoginByPassword(loginParam parameter.LoginByPasswordRequest) *model.User {
-	// TODO
-	return nil
+func (s *UserService) LoginByPassword(loginParam parameter.LoginByPasswordRequest) bool {
+	userDao := dao.UserDao{}
+	ok := userDao.ValidatePassword(loginParam.Username, loginParam.Password)
+	return ok
 }
 
 // Register 注册

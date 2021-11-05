@@ -89,7 +89,33 @@ func LoginByPhone(context *gin.Context) {
 
 // LoginByPassword 用密码登录
 func LoginByPassword(context *gin.Context) {
-	// TODO
+	var loginByPasswordParameter = parameter.LoginByPasswordRequest{}
+	err := context.ShouldBindJSON(&loginByPasswordParameter)
+	if err != nil {
+		context.JSON(http.StatusOK, parameter.LoginResponse{
+			Code:      FAILED,
+			Message:   "发送的表单格式错误",
+			SessionId: "",               // TODO
+			Data:      parameter.Data{}, // TODO
+		})
+	}
+	smsService := service.UserService{}
+	ok := smsService.LoginByPassword(loginByPasswordParameter)
+	if ok {
+		context.JSON(http.StatusOK, parameter.LoginResponse{
+			Code:      SUCCESS,
+			Message:   "登录成功",
+			SessionId: "",               // TODO
+			Data:      parameter.Data{}, // TODO
+		})
+		return
+	}
+	context.JSON(http.StatusOK, parameter.LoginResponse{
+		Code:      FAILED,
+		Message:   "登录失败",
+		SessionId: "",               // TODO
+		Data:      parameter.Data{}, // TODO
+	})
 }
 
 // Register 注册

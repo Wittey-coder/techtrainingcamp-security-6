@@ -30,6 +30,20 @@ func (u *UserDao) ValidateSmsCode(phone string, code string) *model.SmsCode {
 	return &sms
 }
 
+// ValidatePassword 查看用户名和密码是否正确
+func (u *UserDao) ValidatePassword(username string, password string) bool {
+	var user model.User
+	has, err := u.Where("username = ?, password = ?", username, password).Get(&user)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	if has {
+		return true
+	} else {
+		return false
+	}
+}
+
 // QueryByPhone 查看此手机是否被注册
 func (u *UserDao) QueryByPhone(phone string) *model.User {
 	var user model.User
@@ -54,7 +68,7 @@ func (u *UserDao) InsertUser(user model.User) int64 {
 	return result
 }
 
-// CleanOutdatedSmsCode
+// CleanOutdatedSmsCode 清除过期数据
 func (u *UserDao) CleanOutdatedSmsCode(expireTime int64) {
 	_, err := u.Where("create_time < ? + ?", time.Now().Unix(), expireTime).Delete(model.SmsCode{})
 	if err != nil {
