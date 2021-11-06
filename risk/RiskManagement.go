@@ -10,7 +10,6 @@ package risk
 import (
 	"awesomeProject/parameter"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -91,13 +90,13 @@ func CheckRisk(context *gin.Context) {
 	case ENTER:
 		return
 	case CHECK:
-		context.JSON(http.StatusOK, parameter.ApplyCodeResponse{
+		context.Set("RETURN", parameter.ApplyCodeResponse{
 			Code:    CHECK_CODE,
 			Message: "需要进行验证！",
 		})
 		context.Abort()
 	case ABORT:
-		context.JSON(http.StatusOK, parameter.ApplyCodeResponse{
+		context.Set("RETURN", parameter.ApplyCodeResponse{
 			Code:    FAILED_CODE,
 			Message: "操作被拦截！",
 		})
