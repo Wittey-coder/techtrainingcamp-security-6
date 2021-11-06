@@ -4,7 +4,9 @@ go 1.17
 
 require (
 	github.com/gin-gonic/gin v1.7.4
+	github.com/go-sql-driver/mysql v1.6.0
 	github.com/go-xorm/xorm v0.7.9
+	github.com/satori/go.uuid v1.2.0
 )
 
 require (
@@ -12,7 +14,6 @@ require (
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
-	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/kr/pretty v0.3.0 // indirect

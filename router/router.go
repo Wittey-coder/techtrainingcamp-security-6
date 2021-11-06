@@ -10,7 +10,7 @@ func SetRoute() *gin.Engine {
 
 	applyCode := engine.Group("/code") // 发送验证码
 	{
-		applyCode.GET("", controller.SendCode)
+		applyCode.POST("", controller.SendCode)
 	}
 
 	register := engine.Group("/register") // 注册相关的功能
