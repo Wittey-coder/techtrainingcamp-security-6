@@ -1,6 +1,7 @@
 package tool
 
 import (
+	"awesomeProject/model"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
 )
@@ -22,7 +23,7 @@ func OrmEngine(cfg *Config) (*Orm, error) {
 	engine.ShowSQL(database.ShowSql)
 	// 两张表，验证码和用户
 	// 这条语句只能执行一次
-	//err = engine.Sync2(new(model.SmsCode), new(model.User))
+	err = engine.Sync2(new(model.SmsCode), new(model.User))
 	if err != nil {
 		return nil, err
 	}
