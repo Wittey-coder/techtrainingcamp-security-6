@@ -2,12 +2,13 @@ package router
 
 import (
 	"awesomeProject/controller"
+	"awesomeProject/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 func SetRoute() *gin.Engine {
-	engine := gin.Default()
-
+	engine := gin.New()
+	engine.Use(middleware.ReturnJSON, gin.Recovery(), gin.Logger())
 	applyCode := engine.Group("/code") // 发送验证码
 	{
 		applyCode.POST("", controller.SendCode)

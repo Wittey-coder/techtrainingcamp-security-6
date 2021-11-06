@@ -5,7 +5,6 @@ import (
 	"awesomeProject/service"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"net/http"
 )
 
 const (
@@ -18,7 +17,7 @@ func SendCode(context *gin.Context) {
 	var applyCode = parameter.ApplyCodeRequest{}
 	err := context.ShouldBindWith(&applyCode, binding.JSON)
 	if err != nil {
-		context.JSON(http.StatusOK, parameter.ApplyCodeResponse{
+		context.Set("JSON", parameter.ApplyCodeResponse{
 			Code:    FAILED,
 			Message: "信息错误！",
 			CodeData: parameter.CodeData{
@@ -33,7 +32,7 @@ func SendCode(context *gin.Context) {
 	smsService := service.UserService{}
 	hasSent, s := smsService.SendCode(applyCode.PhoneNumber)
 	if hasSent {
-		context.JSON(http.StatusOK, parameter.ApplyCodeResponse{
+		context.Set("JSON", parameter.ApplyCodeResponse{
 			Code:    SUCCESS,
 			Message: "请求成功",
 			CodeData: parameter.CodeData{
@@ -44,7 +43,7 @@ func SendCode(context *gin.Context) {
 		})
 		return
 	}
-	context.JSON(http.StatusOK, parameter.ApplyCodeResponse{
+	context.Set("JSON", parameter.ApplyCodeResponse{
 		Code:    FAILED,
 		Message: "生成验证码失败！",
 		CodeData: parameter.CodeData{
@@ -60,7 +59,7 @@ func LoginByPhone(context *gin.Context) {
 	var loginByPhoneParameter = parameter.LoginByPhoneRequest{}
 	err := context.ShouldBindWith(&loginByPhoneParameter, binding.JSON)
 	if err != nil {
-		context.JSON(http.StatusOK, parameter.LoginResponse{
+		context.Set("JSON", parameter.LoginResponse{
 			Code:      FAILED,
 			Message:   "发送的表单格式错误",
 			SessionId: "",               // TODO
@@ -71,7 +70,7 @@ func LoginByPhone(context *gin.Context) {
 	smsService := service.UserService{}
 	user := smsService.LoginByPhone(loginByPhoneParameter)
 	if user != nil {
-		context.JSON(http.StatusOK, parameter.LoginResponse{
+		context.Set("JSON", parameter.LoginResponse{
 			Code:      SUCCESS,
 			Message:   "登录成功",
 			SessionId: "",               // TODO
@@ -79,7 +78,7 @@ func LoginByPhone(context *gin.Context) {
 		})
 		return
 	}
-	context.JSON(http.StatusOK, parameter.LoginResponse{
+	context.Set("JSON", parameter.LoginResponse{
 		Code:      FAILED,
 		Message:   "登录失败",
 		SessionId: "",               // TODO
@@ -92,7 +91,7 @@ func LoginByPassword(context *gin.Context) {
 	var loginByPasswordParameter = parameter.LoginByPasswordRequest{}
 	err := context.ShouldBindWith(&loginByPasswordParameter, binding.JSON)
 	if err != nil {
-		context.JSON(http.StatusOK, parameter.LoginResponse{
+		context.Set("JSON", parameter.LoginResponse{
 			Code:      FAILED,
 			Message:   "发送的表单格式错误",
 			SessionId: "",               // TODO
@@ -103,7 +102,7 @@ func LoginByPassword(context *gin.Context) {
 	userService := service.UserService{}
 	user := userService.LoginByPassword(loginByPasswordParameter)
 	if user != nil {
-		context.JSON(http.StatusOK, parameter.LoginResponse{
+		context.Set("JSON", parameter.LoginResponse{
 			Code:      SUCCESS,
 			Message:   "登录成功",
 			SessionId: "",               // TODO
@@ -111,7 +110,7 @@ func LoginByPassword(context *gin.Context) {
 		})
 		return
 	}
-	context.JSON(http.StatusOK, parameter.LoginResponse{
+	context.Set("JSON", parameter.LoginResponse{
 		Code:      FAILED,
 		Message:   "登录失败",
 		SessionId: "",               // TODO
@@ -124,7 +123,7 @@ func Register(context *gin.Context) {
 	var registerParameter = parameter.RegisterRequest{}
 	err := context.ShouldBindWith(&registerParameter, binding.JSON)
 	if err != nil {
-		context.JSON(http.StatusOK, parameter.LoginResponse{
+		context.Set("JSON", parameter.LoginResponse{
 			Code:      FAILED,
 			Message:   "发送的表单格式错误",
 			SessionId: "",               // TODO
@@ -135,7 +134,7 @@ func Register(context *gin.Context) {
 	userService := service.UserService{}
 	register := userService.Register(registerParameter)
 	if register != nil {
-		context.JSON(http.StatusOK, parameter.LoginResponse{
+		context.Set("JSON", parameter.LoginResponse{
 			Code:      SUCCESS,
 			Message:   "注册成功",
 			SessionId: "",               // TODO
@@ -143,7 +142,7 @@ func Register(context *gin.Context) {
 		})
 		return
 	}
-	context.JSON(http.StatusOK, parameter.LoginResponse{
+	context.Set("JSON", parameter.LoginResponse{
 		Code:      FAILED,
 		Message:   "注册失败，有相同的用户名或手机号被注册",
 		SessionId: "",               // TODO
@@ -153,17 +152,7 @@ func Register(context *gin.Context) {
 
 // Logout 登出
 func Logout(context *gin.Context) {
-	//var logoutParameter = parameter.LogoutRequest{}
-	//err := context.ShouldBindWith(&logoutParameter, binding.JSON)
-	//if err != nil {
-	//	context.JSON(http.StatusOK, parameter.LoginResponse{
-	//		Code:      FAILED,
-	//		Message:   "发送的表单格式错误",
-	//	})
-	//	return
-	//}
-	//userService := service.UserService{}
-	//userService.LogoutUser(logoutParameter).
+	// TODO
 }
 
 // Logoff 注销
