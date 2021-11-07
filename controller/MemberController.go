@@ -181,7 +181,7 @@ func Register(context *gin.Context) {
 	}
 	context.Set("RETURN", parameter.LoginResponse{
 		Code:      FAILED,
-		Message:   "注册失败，有相同的用户名或手机号被注册",
+		Message:   "注册失败，有相同的用户名或手机号被注册或者验证码错误！",
 		SessionId: "",               // TODO
 		Data:      parameter.Data{}, // TODO
 	})

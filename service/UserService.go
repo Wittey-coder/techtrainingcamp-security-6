@@ -63,6 +63,10 @@ func (s *UserService) LoginByPassword(loginParam parameter.LoginByPasswordReques
 // Register 注册
 func (s *UserService) Register(registerParam parameter.RegisterRequest) *model.User {
 	userDao := dao.UserDao{Orm: tool.DbEngine}
+	smsCode := userDao.ValidateSmsCode(registerParam.PhoneNumber, registerParam.VerifyCode)
+	if smsCode.Id == 0 {
+		return nil
+	}
 	result, user := userDao.InsertUser(registerParam.Username, registerParam.PhoneNumber, registerParam.Password)
 	if result == 0 {
 		return nil
