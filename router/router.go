@@ -23,8 +23,8 @@ func SetRoute() *gin.Engine {
 
 	login := engine.Group("/login") // 登录相关的功能
 	{
-		login.POST("/sms", controller.LoginByPhone, risk.CheckRisk, controller.LoginByPhone)
-		login.POST("/word", controller.LoginByPassword, risk.CheckRisk, controller.LoginByPassword)
+		login.POST("/sms", controller.GetLoginByPhoneJSON, risk.CheckRisk, controller.LoginByPhone)
+		login.POST("/word", controller.GetLoginByPasswordJSON, risk.CheckRisk, controller.LoginByPassword)
 	}
 
 	cancel := engine.Group("/cancel") // 登出相关的功能

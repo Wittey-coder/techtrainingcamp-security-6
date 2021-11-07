@@ -1,6 +1,7 @@
 package main
 
 import (
+	"awesomeProject/cyclic"
 	"awesomeProject/router"
 	"awesomeProject/tool"
 	"log"
@@ -21,6 +22,9 @@ func main() {
 
 	// 配置路由
 	app := router.SetRoute()
+
+	// 设置定时任务
+	cyclic.AsynchronousLoop()
 
 	// GO!
 	err = app.Run(cfg.AppHost + ":" + cfg.AppPort)

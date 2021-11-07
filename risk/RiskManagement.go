@@ -1,18 +1,10 @@
-/*
- * @Author: flwfdd
- * @Date: 2021-11-04 23:00:09
- * @LastEditTime: 2021-11-05 22:43:13
- * @Description:
- * _(:з」∠)_
- */
 package risk
 
 import (
 	"awesomeProject/parameter"
 	"fmt"
-	"time"
-
 	"github.com/gin-gonic/gin"
+	"time"
 )
 
 const DEBUG = true
@@ -33,13 +25,13 @@ const (
 	MAX_HEAT = 23332333
 )
 
-type heat_type struct {
+type heatType struct {
 	heat int //热力值
 	time int //时间
 }
 
 //存放热力值
-var mp map[string]heat_type
+var mp map[string]heatType
 
 func max(a, b int) int {
 	if a > b {
@@ -57,35 +49,35 @@ func min(a, b int) int {
 	}
 }
 
-func get_time() int {
+func getTime() int {
 	return int(time.Now().Unix())
 }
 
 //获取热力值
-func get_heat(s *string) (heat, dt int) {
+func getHeat(s *string) (heat, dt int) {
 	elem, ok := mp[*s]
 	if ok {
-		dt := get_time() - elem.time + 1
+		dt := getTime() - elem.time + 1
 		if DEBUG {
 			fmt.Printf("%v %v\n", *s, max(elem.heat-dt, 0))
 		}
 		return max(elem.heat-dt, 0), dt
 	} else {
-		elem = heat_type{0, get_time()}
+		elem = heatType{0, getTime()}
 		mp[*s] = elem
 		return 0, 1
 	}
 }
 
 //设置热力值
-func set_heat(s *string, heat int) {
-	mp[*s] = heat_type{min(max(heat, 0), MAX_HEAT), get_time()}
+func setHeat(s *string, heat int) {
+	mp[*s] = heatType{min(max(heat, 0), MAX_HEAT), getTime()}
 }
 
 func CheckRisk(context *gin.Context) {
 	value, _ := context.Get("JSON")
 
-	status := check_risk_once(value)
+	status := checkRiskOnce(value)
 	switch status {
 	case ENTER:
 		return
@@ -105,17 +97,17 @@ func CheckRisk(context *gin.Context) {
 }
 
 //检查风险，返回0:正常 1:验证 2:拦截
-func check_risk_once(i interface{}) int {
+func checkRiskOnce(i interface{}) int {
 	s := ""
 
 	switch info := i.(type) {
 	case parameter.Environment: //IP和设备ID
-		s = "I" + info.IP
-		heat1, dt := get_heat(&s)
-		set_heat(&s, 2*heat1/dt+4)
+		s = "I:" + info.IP
+		heat1, dt := getHeat(&s)
+		setHeat(&s, 2*heat1/dt+4)
 		s = "D" + info.DeviceID
-		heat2, dt := get_heat(&s)
-		set_heat(&s, 2*heat2/dt+4)
+		heat2, dt := getHeat(&s)
+		setHeat(&s, 2*heat2/dt+4)
 		heat := max(heat1, heat2)
 
 		if heat < 300 {
@@ -127,8 +119,8 @@ func check_risk_once(i interface{}) int {
 		}
 	case parameter.LoginByPasswordRequest: //密码登录
 		s = "U" + info.Username
-		heat, dt := get_heat(&s)
-		set_heat(&s, 5*heat/dt+30)
+		heat, dt := getHeat(&s)
+		setHeat(&s, 5*heat/dt+30)
 
 		out := ENTER
 		if heat < 300 {
@@ -138,11 +130,11 @@ func check_risk_once(i interface{}) int {
 		} else {
 			out = ABORT
 		}
-		return max(out, check_risk_once(info.Environment))
+		return max(out, checkRiskOnce(info.Environment))
 	case parameter.LoginByPhoneRequest: //手机登录
 		s = "P" + info.PhoneNumber
-		heat, dt := get_heat(&s)
-		set_heat(&s, 5*heat/dt+30)
+		heat, dt := getHeat(&s)
+		setHeat(&s, 5*heat/dt+30)
 
 		out := ENTER
 		if heat < 300 {
@@ -152,11 +144,11 @@ func check_risk_once(i interface{}) int {
 		} else {
 			out = ABORT
 		}
-		return max(out, check_risk_once(info.Environment))
+		return max(out, checkRiskOnce(info.Environment))
 	case parameter.ApplyCodeRequest: //手机号获取验证码
 		s = "P" + info.PhoneNumber
-		heat, dt := get_heat(&s)
-		set_heat(&s, 5*heat/dt+30)
+		heat, dt := getHeat(&s)
+		setHeat(&s, 5*heat/dt+30)
 
 		out := ENTER
 		if heat < 300 {
@@ -166,11 +158,11 @@ func check_risk_once(i interface{}) int {
 		} else {
 			out = ABORT
 		}
-		return max(out, check_risk_once(info.Environment))
+		return max(out, checkRiskOnce(info.Environment))
 	case parameter.RegisterRequest: //手机号注册
 		s = "P" + info.PhoneNumber
-		heat, dt := get_heat(&s)
-		set_heat(&s, 5*heat/dt+30)
+		heat, dt := getHeat(&s)
+		setHeat(&s, 5*heat/dt+30)
 
 		out := ENTER
 		if heat < 300 {
@@ -180,7 +172,7 @@ func check_risk_once(i interface{}) int {
 		} else {
 			out = ABORT
 		}
-		return max(out, check_risk_once(info.Environment))
+		return max(out, checkRiskOnce(info.Environment))
 	default:
 		fmt.Printf("Risk unkown type: %T\n", info)
 		return 2
@@ -188,6 +180,6 @@ func check_risk_once(i interface{}) int {
 }
 
 func init() {
-	mp = make(map[string]heat_type)
+	mp = make(map[string]heatType)
 	fmt.Println("Here is RiskManagement")
 }

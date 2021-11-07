@@ -14,7 +14,7 @@ const (
 	FAILED  int = 1
 )
 
-//解析发送验证码JSON
+// GetSendCodeJSON 解析发送验证码JSON
 func GetSendCodeJSON(context *gin.Context) {
 	var applyCode = parameter.ApplyCodeRequest{}
 	err := context.ShouldBindWith(&applyCode, binding.JSON)
@@ -24,7 +24,7 @@ func GetSendCodeJSON(context *gin.Context) {
 			Message: "信息错误！",
 			CodeData: parameter.CodeData{
 				VerifyCode:   "",
-				ExpireTime:   0,
+				ExpireTime:   600,
 				DecisionType: 0,
 			},
 		})
@@ -64,7 +64,7 @@ func SendCode(context *gin.Context) {
 	})
 }
 
-//解析手机登录JSON
+// GetLoginByPhoneJSON 解析手机登录JSON
 func GetLoginByPhoneJSON(context *gin.Context) {
 	var loginByPhoneParameter = parameter.LoginByPhoneRequest{}
 	err := context.ShouldBindWith(&loginByPhoneParameter, binding.JSON)
@@ -105,7 +105,7 @@ func LoginByPhone(context *gin.Context) {
 	})
 }
 
-//解析密码登录JSON
+// GetLoginByPasswordJSON 解析密码登录JSON
 func GetLoginByPasswordJSON(context *gin.Context) {
 	var loginByPasswordParameter = parameter.LoginByPasswordRequest{}
 	err := context.ShouldBindWith(&loginByPasswordParameter, binding.JSON)
@@ -146,7 +146,7 @@ func LoginByPassword(context *gin.Context) {
 	})
 }
 
-//解析注册JSON
+// GetRegisterJSON 解析注册JSON
 func GetRegisterJSON(context *gin.Context) {
 	var registerParameter = parameter.RegisterRequest{}
 	err := context.ShouldBindWith(&registerParameter, binding.JSON)

@@ -92,7 +92,7 @@ func (u *UserDao) InsertUser(username string, phone string, password string) (in
 
 // CleanOutdatedSmsCode 清除过期数据
 func (u *UserDao) CleanOutdatedSmsCode(expireTime int64) {
-	_, err := u.Where("create_time < ? + ?", time.Now().Unix(), expireTime).Delete(model.SmsCode{})
+	_, err := u.Where("create_time < ? - ?", time.Now().Unix(), expireTime).Delete(model.SmsCode{})
 	if err != nil {
 		log.Println(err.Error())
 	}

@@ -11,6 +11,6 @@
     "port": "3306",
     "db_name": "ginsql",
     "charset": "utf8",
-    "show_sql":true
+    "show_sql":false
   }
 }
