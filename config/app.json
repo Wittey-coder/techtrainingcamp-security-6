@@ -7,7 +7,7 @@
   "database": {
     "driver": "mysql",
     "user": "root",
-    "password": "Sakuya1314",
+    "password": "",
     "host": "127.0.0.1",
     "port": "3306",
     "db_name": "ginsql",
@@ -15,7 +15,7 @@
     "show_sql":false
   },
   "redis": {
-    "password": "123",
+    "password": "",
     "host": "127.0.0.1",
     "port": "6379"
   }
