@@ -45,17 +45,17 @@ func (u *UserDao) ValidatePassword(username string, password string) *model.User
 	}
 }
 
-func (u *UserDao) UpdateLoggedDeviceNumber(changedDevices int, username string) *model.User {
-	var user model.User
-	_, _ = u.Where("username = ?", username).Get(&user)
-	var updated model.User
-	updated.ActiveNumber = user.ActiveNumber + changedDevices
-	_, err := u.Id(user.Id).Cols("active_number").Update(updated)
-	if err != nil {
-		return nil
-	}
-	return &user
-}
+//func (u *UserDao) UpdateLoggedDeviceNumber(changedDevices int, username string) *model.User {
+//	var user model.User
+//	_, _ = u.Where("username = ?", username).Get(&user)
+//	var updated model.User
+//	updated.ActiveNumber = user.ActiveNumber + changedDevices
+//	_, err := u.Id(user.Id).Cols("active_number").Update(updated)
+//	if err != nil {
+//		return nil
+//	}
+//	return &user
+//}
 
 // QueryByPhone 查看此手机是否被注册
 func (u *UserDao) QueryByPhone(phone string) *model.User {
@@ -75,11 +75,10 @@ func (u *UserDao) QueryByPhone(phone string) *model.User {
 func (u *UserDao) InsertUser(username string, phone string, password string) (int64, *model.User) {
 
 	var user = model.User{
-		Id:           uuid.NewV4().String(),
-		Username:     username,
-		Phone:        phone,
-		Password:     password,
-		ActiveNumber: 0,
+		Id:       uuid.NewV4().String(),
+		Username: username,
+		Phone:    phone,
+		Password: password,
 	}
 
 	result, err := u.InsertOne(&user)
@@ -88,6 +87,14 @@ func (u *UserDao) InsertUser(username string, phone string, password string) (in
 		return 0, nil
 	}
 	return result, &user
+}
+
+func (u *UserDao) DeleteUserByUsername(username string) error {
+	_, err := u.Where("username = ?", username).Delete(model.User{})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // CleanOutdatedSmsCode 清除过期数据

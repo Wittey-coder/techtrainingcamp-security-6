@@ -10,15 +10,15 @@ import (
 const DEBUG = true
 
 const (
-	SUCCESS_CODE = 0
-	FAILED_CODE  = 1
-	CHECK_CODE   = 2
+	ENTER = iota
+	CHECK
+	WAIT
+	BANNED
 )
 
 const (
-	ENTER = 0
-	CHECK = 1
-	ABORT = 2
+	SUCCESS = iota
+	FAILED
 )
 
 const (
@@ -74,7 +74,7 @@ func setHeat(s *string, heat int) {
 	mp[*s] = heatType{min(max(heat, 0), MAX_HEAT), getTime()}
 }
 
-func CheckRisk(context *gin.Context) {
+func CheckRiskForApplyCode(context *gin.Context) {
 	value, _ := context.Get("JSON")
 
 	status := checkRiskOnce(value)
@@ -83,20 +83,84 @@ func CheckRisk(context *gin.Context) {
 		return
 	case CHECK:
 		context.Set("RETURN", parameter.ApplyCodeResponse{
-			Code:    CHECK_CODE,
+			Code:    FAILED,
 			Message: "需要进行验证！",
+			CodeData: parameter.CodeData{
+				VerifyCode:   "",
+				ExpireTime:   0,
+				DecisionType: CHECK,
+			},
 		})
+		context.Set("decisionType", CHECK)
 		context.Abort()
-	case ABORT:
+	case WAIT:
 		context.Set("RETURN", parameter.ApplyCodeResponse{
-			Code:    FAILED_CODE,
-			Message: "操作被拦截！",
+			Code:    FAILED,
+			Message: "访问频率过高！需要等待热力值下降！",
+			CodeData: parameter.CodeData{
+				VerifyCode:   "",
+				ExpireTime:   0,
+				DecisionType: WAIT,
+			},
 		})
+		context.Set("decisionType", WAIT)
+		context.Abort()
+	case BANNED:
+		context.Set("RETURN", parameter.ApplyCodeResponse{
+			Code:    FAILED,
+			Message: "操作被拦截！",
+			CodeData: parameter.CodeData{
+				VerifyCode:   "",
+				ExpireTime:   0,
+				DecisionType: BANNED,
+			},
+		})
+		context.Set("decisionType", BANNED)
 		context.Abort()
 	}
 }
 
-//检查风险，返回0:正常 1:验证 2:拦截
+func CheckRiskForLog(context *gin.Context) {
+	value, _ := context.Get("JSON")
+
+	status := checkRiskOnce(value)
+	switch status {
+	case ENTER:
+		return
+	case CHECK:
+		context.Set("RETURN", parameter.LoginResponse{
+			Code:    0,
+			Message: "需要进行验证!",
+			Data: parameter.Data{
+				DecisionType: CHECK,
+			},
+		})
+		context.Set("decisionType", CHECK)
+		context.Abort()
+	case WAIT:
+		context.Set("RETURN", parameter.LoginResponse{
+			Code:    FAILED,
+			Message: "访问频率过高！需要等待热力值下降！",
+			Data: parameter.Data{
+				DecisionType: WAIT,
+			},
+		})
+		context.Set("decisionType", WAIT)
+		context.Abort()
+	case BANNED:
+		context.Set("RETURN", parameter.LoginResponse{
+			Code:    FAILED,
+			Message: "操作被拦截！",
+			Data: parameter.Data{
+				DecisionType: BANNED,
+			},
+		})
+		context.Set("decisionType", BANNED)
+		context.Abort()
+	}
+}
+
+//检查风险，返回 0:正常 1:验证 2:等待 2:拦截
 func checkRiskOnce(i interface{}) int {
 	s := ""
 
@@ -110,25 +174,31 @@ func checkRiskOnce(i interface{}) int {
 		setHeat(&s, 2*heat2/dt+4)
 		heat := max(heat1, heat2)
 
-		if heat < 300 {
-			return 0
+		out := ENTER
+		if heat < 50 {
+			out = ENTER
 		} else if heat < 3600 {
-			return 1
+			out = CHECK
+		} else if heat < 12000 {
+			out = WAIT
 		} else {
-			return 2
+			out = BANNED
 		}
+		return out
 	case parameter.LoginByPasswordRequest: //密码登录
 		s = "U" + info.Username
 		heat, dt := getHeat(&s)
 		setHeat(&s, 5*heat/dt+30)
 
 		out := ENTER
-		if heat < 300 {
+		if heat < 50 {
 			out = ENTER
 		} else if heat < 3600 {
 			out = CHECK
+		} else if heat < 12000 {
+			out = WAIT
 		} else {
-			out = ABORT
+			out = BANNED
 		}
 		return max(out, checkRiskOnce(info.Environment))
 	case parameter.LoginByPhoneRequest: //手机登录
@@ -137,12 +207,14 @@ func checkRiskOnce(i interface{}) int {
 		setHeat(&s, 5*heat/dt+30)
 
 		out := ENTER
-		if heat < 300 {
+		if heat < 50 {
 			out = ENTER
 		} else if heat < 3600 {
 			out = CHECK
+		} else if heat < 12000 {
+			out = WAIT
 		} else {
-			out = ABORT
+			out = BANNED
 		}
 		return max(out, checkRiskOnce(info.Environment))
 	case parameter.ApplyCodeRequest: //手机号获取验证码
@@ -151,12 +223,14 @@ func checkRiskOnce(i interface{}) int {
 		setHeat(&s, 5*heat/dt+30)
 
 		out := ENTER
-		if heat < 300 {
+		if heat < 50 {
 			out = ENTER
 		} else if heat < 3600 {
 			out = CHECK
+		} else if heat < 12000 {
+			out = WAIT
 		} else {
-			out = ABORT
+			out = BANNED
 		}
 		return max(out, checkRiskOnce(info.Environment))
 	case parameter.RegisterRequest: //手机号注册
@@ -165,12 +239,14 @@ func checkRiskOnce(i interface{}) int {
 		setHeat(&s, 5*heat/dt+30)
 
 		out := ENTER
-		if heat < 300 {
+		if heat < 50 {
 			out = ENTER
 		} else if heat < 3600 {
 			out = CHECK
+		} else if heat < 12000 {
+			out = WAIT
 		} else {
-			out = ABORT
+			out = BANNED
 		}
 		return max(out, checkRiskOnce(info.Environment))
 	default:

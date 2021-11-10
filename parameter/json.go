@@ -15,9 +15,7 @@ type CodeData struct {
 
 // Data Session及相关信息
 type Data struct {
-	SessionId    string `json:"session_id"`
-	ExpireTime   int    `json:"expire_time"`
-	DecisionType int    `json:"decision_type"`
+	DecisionType int `json:"decision_type"`
 }
 
 // ApplyCodeRequest 验证码请求
@@ -44,10 +42,9 @@ type RegisterRequest struct {
 
 // RegisterResponse 注册响应
 type RegisterResponse struct {
-	Code      int    `json:"code"`
-	Message   string `json:"message"`
-	SessionId string `json:"session_id"`
-	Data      `json:"data"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    `json:"data"`
 }
 
 // LoginByPasswordRequest 密码登录请求
@@ -66,16 +63,14 @@ type LoginByPhoneRequest struct {
 
 // LoginResponse 登录响应
 type LoginResponse struct {
-	Code      int    `json:"code"`
-	Message   string `json:"message"`
-	SessionId string `json:"session_id"`
-	Data      `json:"data"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    `json:"data"`
 }
 
 // LogoutRequest 登出/注销请求
 type LogoutRequest struct {
-	SessionId   string `json:"session_id"`
-	ActionType  int    `json:"action_type"`
+	ActionType  int `json:"action_type"`
 	Environment `json:"environment"`
 }
 

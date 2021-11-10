@@ -8,11 +8,13 @@ import (
 )
 
 type Config struct {
-	AppName  string         `json:"app_name"`
-	AppMode  string         `json:"app_mode"`
-	AppHost  string         `json:"app_host"`
-	AppPort  string         `json:"app_port"`
-	Database DatabaseConfig `json:"database"`
+	AppName       string         `json:"app_name"`
+	AppMode       string         `json:"app_mode"`
+	AppHost       string         `json:"app_host"`
+	AppPort       string         `json:"app_port"`
+	Database      DatabaseConfig `json:"database"`
+	SessionBuffer string         `json:"session_buffer"`
+	Redis         RedisConfig    `json:"redis"`
 }
 
 type DatabaseConfig struct {
@@ -24,6 +26,12 @@ type DatabaseConfig struct {
 	DbName   string `json:"db_name"`
 	Charset  string `json:"charset"`
 	ShowSql  bool   `json:"show_sql"`
+}
+
+type RedisConfig struct {
+	Password string `json:"password"`
+	Host     string `json:"host"`
+	Port     string `json:"port"`
 }
 
 var _cfg *Config = nil

@@ -70,10 +70,9 @@ func GetLoginByPhoneJSON(context *gin.Context) {
 	err := context.ShouldBindWith(&loginByPhoneParameter, binding.JSON)
 	if err != nil {
 		context.Set("RETURN", parameter.LoginResponse{
-			Code:      FAILED,
-			Message:   "发送的表单格式错误",
-			SessionId: "",               // TODO
-			Data:      parameter.Data{}, // TODO
+			Code:    FAILED,
+			Message: "发送的表单格式错误",
+			Data:    parameter.Data{},
 		})
 		context.Abort()
 	} else {
@@ -90,19 +89,23 @@ func LoginByPhone(context *gin.Context) {
 	user := smsService.LoginByPhone(loginByPhoneParameter)
 	if user != nil {
 		context.Set("RETURN", parameter.LoginResponse{
-			Code:      SUCCESS,
-			Message:   "登录成功",
-			SessionId: "",               // TODO
-			Data:      parameter.Data{}, // TODO
+			Code:    SUCCESS,
+			Message: "登录成功",
+			Data:    parameter.Data{},
 		})
+		// 给Session控制器发送登录成功参数
+		context.Set("isLogin", true)
+		context.Set("username", smsService.GetUsernameByPhone(loginByPhoneParameter))
 		return
 	}
 	context.Set("RETURN", parameter.LoginResponse{
-		Code:      FAILED,
-		Message:   "登录失败",
-		SessionId: "",               // TODO
-		Data:      parameter.Data{}, // TODO
+		Code:    FAILED,
+		Message: "登录失败",
+		Data:    parameter.Data{},
 	})
+	// 给Session控制器发送登录失败参数
+	context.Set("isLogin", false)
+	context.Set("username", smsService.GetUsernameByPhone(loginByPhoneParameter))
 }
 
 // GetLoginByPasswordJSON 解析密码登录JSON
@@ -111,10 +114,9 @@ func GetLoginByPasswordJSON(context *gin.Context) {
 	err := context.ShouldBindWith(&loginByPasswordParameter, binding.JSON)
 	if err != nil {
 		context.Set("RETURN", parameter.LoginResponse{
-			Code:      FAILED,
-			Message:   "发送的表单格式错误",
-			SessionId: "",               // TODO
-			Data:      parameter.Data{}, // TODO
+			Code:    FAILED,
+			Message: "发送的表单格式错误",
+			Data:    parameter.Data{},
 		})
 		context.Abort()
 	} else {
@@ -131,19 +133,21 @@ func LoginByPassword(context *gin.Context) {
 	user := userService.LoginByPassword(loginByPasswordParameter)
 	if user != nil {
 		context.Set("RETURN", parameter.LoginResponse{
-			Code:      SUCCESS,
-			Message:   "登录成功",
-			SessionId: "",               // TODO
-			Data:      parameter.Data{}, // TODO
+			Code:    SUCCESS,
+			Message: "登录成功",
+			Data:    parameter.Data{},
 		})
+		context.Set("isLogin", true)
+		context.Set("username", loginByPasswordParameter.Username)
 		return
 	}
 	context.Set("RETURN", parameter.LoginResponse{
-		Code:      FAILED,
-		Message:   "登录失败",
-		SessionId: "",               // TODO
-		Data:      parameter.Data{}, // TODO
+		Code:    FAILED,
+		Message: "登录失败",
+		Data:    parameter.Data{},
 	})
+	context.Set("isLogin", false)
+	context.Set("username", loginByPasswordParameter.Username)
 }
 
 // GetRegisterJSON 解析注册JSON
@@ -152,10 +156,9 @@ func GetRegisterJSON(context *gin.Context) {
 	err := context.ShouldBindWith(&registerParameter, binding.JSON)
 	if err != nil {
 		context.Set("RETURN", parameter.LoginResponse{
-			Code:      FAILED,
-			Message:   "发送的表单格式错误",
-			SessionId: "",               // TODO
-			Data:      parameter.Data{}, // TODO
+			Code:    FAILED,
+			Message: "发送的表单格式错误",
+			Data:    parameter.Data{},
 		})
 		context.Abort()
 	} else {
@@ -172,27 +175,107 @@ func Register(context *gin.Context) {
 	register := userService.Register(registerParameter)
 	if register != nil {
 		context.Set("RETURN", parameter.LoginResponse{
-			Code:      SUCCESS,
-			Message:   "注册成功",
-			SessionId: "",               // TODO
-			Data:      parameter.Data{}, // TODO
+			Code:    SUCCESS,
+			Message: "注册成功",
+			Data:    parameter.Data{},
 		})
+		context.Set("isLogin", true)
+		context.Set("username", registerParameter.Username)
 		return
 	}
 	context.Set("RETURN", parameter.LoginResponse{
-		Code:      FAILED,
-		Message:   "注册失败，有相同的用户名或手机号被注册或者验证码错误！",
-		SessionId: "",               // TODO
-		Data:      parameter.Data{}, // TODO
+		Code:    FAILED,
+		Message: "注册失败，有相同的用户名或手机号被注册或者验证码错误！",
+		Data:    parameter.Data{},
 	})
+	context.Set("isLogin", false)
+	context.Set("username", registerParameter.Username)
 }
 
 // Logout 登出
 func Logout(context *gin.Context) {
-	// TODO
+	logoutParameter_, _ := context.Get("JSON")
+	logoutParameter := logoutParameter_.(parameter.LogoutRequest)
+	if logoutParameter.ActionType == 0 {
+		get, exists := context.Get("isLogin")
+		if !exists {
+			context.Set("RETURN", parameter.LogoutResponse{
+				Code:    1,
+				Message: "此设备并没有成功登录！",
+			})
+		}
+		b := get.(bool)
+		if b {
+			context.Set("RETURN", parameter.LogoutResponse{
+				Code:    0,
+				Message: "登出成功！",
+			})
+			context.Set("isLogin", false)
+		} else {
+			context.Set("RETURN", parameter.LogoutResponse{
+				Code:    1,
+				Message: "此设备并没有成功登录！",
+			})
+		}
+	} else if logoutParameter.ActionType == 1 {
+		get, exists := context.Get("isLogin")
+		if !exists {
+			context.Set("RETURN", parameter.LogoutResponse{
+				Code:    1,
+				Message: "此设备并没有成功登录！",
+			})
+			return
+		}
+		isLogin := get.(bool)
+		get, exists = context.Get("username")
+		username := get.(string)
+		if !exists {
+			context.Set("RETURN", parameter.LogoutResponse{
+				Code:    1,
+				Message: "此设备没有提供要注销的用户名！",
+			})
+			return
+		}
+		if isLogin {
+			userService := service.UserService{}
+			err := userService.LogoffUser(username)
+			if err != nil {
+				context.Set("RETURN", parameter.LogoutResponse{
+					Code:    1,
+					Message: "注销失败！",
+				})
+			}
+			context.Set("RETURN", parameter.LogoutResponse{
+				Code:    0,
+				Message: "注销成功！",
+			})
+
+		} else {
+			context.Set("RETURN", parameter.LogoutResponse{
+				Code:    1,
+				Message: "此设备并没有成功登录！",
+			})
+		}
+	} else {
+		context.Set("RETURN", parameter.LogoutResponse{
+			Code:    1,
+			Message: "提供的参数错误！",
+		})
+	}
+
 }
 
-// Logoff 注销
-func Logoff(context *gin.Context) {
-	// TODO
+// GetLogoutJSON 解析登出JSON
+func GetLogoutJSON(context *gin.Context) {
+	var logoutRequest = parameter.LogoutRequest{}
+	err := context.ShouldBindWith(&logoutRequest, binding.JSON)
+	if err != nil {
+		context.JSON(http.StatusOK, parameter.ApplyCodeResponse{
+			Code:    FAILED,
+			Message: "信息错误！",
+		})
+		context.Abort()
+	} else {
+		context.Set("JSON", logoutRequest)
+	}
 }

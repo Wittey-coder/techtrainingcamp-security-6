@@ -3,6 +3,7 @@
   "app_mode": "debug",
   "app_host": "localhost",
   "app_port": "8080",
+  "session_buffer": "redis",
   "database": {
     "driver": "mysql",
     "user": "root",
@@ -12,5 +13,10 @@
     "db_name": "ginsql",
     "charset": "utf8",
     "show_sql":false
+  },
+  "redis": {
+    "password": "123",
+    "host": "127.0.0.1",
+    "port": "6379"
   }
 }

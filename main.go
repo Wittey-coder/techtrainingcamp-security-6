@@ -3,6 +3,7 @@ package main
 import (
 	"awesomeProject/cyclic"
 	"awesomeProject/router"
+	"awesomeProject/session"
 	"awesomeProject/tool"
 	"log"
 )
@@ -18,6 +19,7 @@ func main() {
 	_, err = tool.OrmEngine(cfg)
 	if err != nil {
 		log.Printf(err.Error())
+		return
 	}
 
 	// 配置路由
@@ -26,9 +28,16 @@ func main() {
 	// 设置定时任务
 	cyclic.AsynchronousLoop()
 
+	// 配置Session管理器
+	err = session.Init(cfg.SessionBuffer, cfg.Redis.Host+":"+cfg.Redis.Port, cfg.Redis.Password)
+	if err != nil {
+		log.Printf(err.Error())
+		return
+	}
 	// GO!
 	err = app.Run(cfg.AppHost + ":" + cfg.AppPort)
 	if err != nil {
 		log.Printf(err.Error())
+		return
 	}
 }

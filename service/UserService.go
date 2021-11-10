@@ -39,10 +39,10 @@ func (s *UserService) LoginByPhone(loginParam parameter.LoginByPhoneRequest) *mo
 	if result1 == nil {
 		return nil
 	}
-	result2 := userDao.UpdateLoggedDeviceNumber(1, result1.Username)
-	if result2 == nil {
-		return nil
-	}
+	//result2 := userDao.UpdateLoggedDeviceNumber(1, result1.Username)
+	//if result2 == nil {
+	//	return nil
+	//}
 	return result1
 }
 
@@ -53,10 +53,10 @@ func (s *UserService) LoginByPassword(loginParam parameter.LoginByPasswordReques
 	if result1 == nil {
 		return nil
 	}
-	result2 := userDao.UpdateLoggedDeviceNumber(1, result1.Username)
-	if result2 == nil {
-		return nil
-	}
+	//result2 := userDao.UpdateLoggedDeviceNumber(1, result1.Username)
+	//if result2 == nil {
+	//	return nil
+	//}
 	return result1
 }
 
@@ -74,7 +74,16 @@ func (s *UserService) Register(registerParam parameter.RegisterRequest) *model.U
 	return user
 }
 
-//func (s *UserService) LogoutUser(logoutParam parameter.LogoutRequest) *model.User {
-//	userDao := dao.UserDao{}
-//	userDao.UpdateLoggedDeviceNumber(-1, logoutParam.)
-//}
+func (s *UserService) GetUsernameByPhone(loginParam parameter.LoginByPhoneRequest) string {
+	userDao := dao.UserDao{Orm: tool.DbEngine}
+	user := userDao.QueryByPhone(loginParam.PhoneNumber)
+	if user != nil {
+		return user.Username
+	}
+	return ""
+}
+func (s *UserService) LogoffUser(username string) error {
+	userDao := dao.UserDao{Orm: tool.DbEngine}
+	err := userDao.DeleteUserByUsername(username)
+	return err
+}
