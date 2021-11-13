@@ -15,17 +15,7 @@ A secure login machine
 
 ## Badge
 
-![](https://img.shields.io/badge/redigo-1.6.3-red)
-
-![](https://img.shields.io/badge/gin-1.7.4-blue)
-
-![](https://img.shields.io/badge/mysql-1.6.0-green)
-
-![](https://img.shields.io/badge/xorm-0.7.9-red)
-
-![](https://img.shields.io/badge/cron-1.2.0-yellow)
-
-![](https://img.shields.io/badge/go.uuid-1.2.0-red)
+![](https://img.shields.io/badge/redigo-1.6.3-red)![](https://img.shields.io/badge/gin-1.7.4-blue)![](https://img.shields.io/badge/mysql-1.6.0-green)![](https://img.shields.io/badge/xorm-0.7.9-red)![](https://img.shields.io/badge/cron-1.2.0-yellow)![](https://img.shields.io/badge/go.uuid-1.2.0-red)
 
 ## Install
 
