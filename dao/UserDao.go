@@ -104,3 +104,16 @@ func (u *UserDao) CleanOutdatedSmsCode(expireTime int64) {
 		log.Println(err.Error())
 	}
 }
+
+func (u *UserDao) QueryCodeByPhone(phone string) *model.SmsCode {
+	var code model.SmsCode
+	has, err := u.Where("phone = ?", phone).Get(&code)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	if has {
+		return &code
+	} else {
+		return nil
+	}
+}

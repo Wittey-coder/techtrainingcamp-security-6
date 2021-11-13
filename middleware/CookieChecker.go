@@ -5,18 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const (
-	ENTER = iota
-	CHECK
-	WAIT
-	ABORT
-)
-
-const (
-	SUCCESS = iota
-	FAILED
-)
-
 func CookieChecker(context *gin.Context) {
 	// 获取cookie里的sessionId数据
 	sessionId, err := context.Cookie("sessionID")

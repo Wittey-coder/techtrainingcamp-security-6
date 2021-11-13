@@ -16,11 +16,15 @@ type UserService struct {
 
 // SendCode 发送验证码
 func (s *UserService) SendCode(phone string) (bool, string) {
+	userDao := dao.UserDao{Orm: tool.DbEngine}
+	codeByPhone := userDao.QueryCodeByPhone(phone)
+	if codeByPhone != nil {
+		return false, ""
+	}
 	// 生成随机验证码
 	code := fmt.Sprintf("%06v", rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(1000000))
 	// 数据库记录验证码
 	smsCode := model.SmsCode{Phone: phone, Code: code, CreateTime: time.Now().Unix()}
-	userDao := dao.UserDao{Orm: tool.DbEngine}
 	result := userDao.InsertCode(&smsCode)
 
 	return result > 0, code

@@ -55,7 +55,7 @@ func SendCode(context *gin.Context) {
 	}
 	context.Set("RETURN", parameter.ApplyCodeResponse{
 		Code:    FAILED,
-		Message: "生成验证码失败！",
+		Message: "生成验证码失败, 可能是之前生成的验证码未过期！",
 		CodeData: parameter.CodeData{
 			VerifyCode:   "",
 			ExpireTime:   0,
