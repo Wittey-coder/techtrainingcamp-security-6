@@ -2,8 +2,6 @@
 
 A secure login machine
 
-[TOC]
-
 ## Backgound
 
 字节后端训练营-抓到你了-第六组项目大作业
@@ -199,10 +197,9 @@ type LogoutResponse struct {
 
 
 ## Maintainers
+@[**Wittey-dev**](https://github.com/Wittey-dev)
 
-吴伯泽 @[**Wittey-dev**](https://github.com/Wittey-dev)
-
-范力文 @[**flwfdd**](https://github.com/flwfdd)
+@[**flwfdd**](https://github.com/flwfdd)
 
 
 
