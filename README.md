@@ -22,6 +22,7 @@ A secure login machine
 进入项目根目录，需要编译，输入：
 
 ```shell
+$ go mod download
 $ go build main.go
 ```
 
