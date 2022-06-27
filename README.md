@@ -4,7 +4,6 @@ A secure login machine
 
 ## Backgound
 
-字节后端训练营-抓到你了-第六组项目大作业
 
 ## Environment
 
